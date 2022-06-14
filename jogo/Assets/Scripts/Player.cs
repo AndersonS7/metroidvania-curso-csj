@@ -15,10 +15,13 @@ public class Player : MonoBehaviour
     public float radius;
     public float health;
 
+    private float recoveryCount;
+
     //controladores
     private bool isJumping;
     private bool doubleJump;
     private bool isAttack;
+    private bool recovery;
 
     // Start is called before the first frame update
     void Start()
@@ -116,13 +119,21 @@ public class Player : MonoBehaviour
         isAttack = false;
     }
 
-    void OnHit()
+    public void OnHit()
     {
-        anim.SetTrigger("hit");
-        health--;
+        recoveryCount += Time.deltaTime;
 
-        if (health <= 0)
+        if (recoveryCount >= 2f)
         {
+            anim.SetTrigger("hit");
+            health--;
+
+            recoveryCount = 0f;
+        }
+
+        if (health <= 0 && !recovery)
+        {
+            recovery = true;
             anim.SetTrigger("dead");
             //game over
         }
