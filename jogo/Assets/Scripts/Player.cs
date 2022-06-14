@@ -8,10 +8,12 @@ public class Player : MonoBehaviour
     private Animator anim;
 
     public Transform point;
+    public LayerMask enemyLayer;
 
     public float speed;
     public float jumpForce;
     public float radius;
+    public float health;
 
     //controladores
     private bool isJumping;
@@ -47,7 +49,7 @@ public class Player : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
 
-            if (!isJumping)
+            if (!isJumping && !isAttack)
             {
                 anim.SetInteger("transition", 1);
             }
@@ -57,7 +59,7 @@ public class Player : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0, 180, 0);
 
-            if (!isJumping)
+            if (!isJumping && !isAttack)
             {
                 anim.SetInteger("transition", 1);
             }
@@ -97,11 +99,11 @@ public class Player : MonoBehaviour
         {
             isAttack = true;
             anim.SetInteger("transition", 3);
-            Collider2D hit = Physics2D.OverlapCircle(point.position, radius);
+            Collider2D hit = Physics2D.OverlapCircle(point.position, radius, enemyLayer);
 
             if (hit != null)
             {
-                Debug.Log(hit.name);
+                hit.GetComponent<Slime>().OnHit();
             }
 
             StartCoroutine(OnAttack());
@@ -114,6 +116,18 @@ public class Player : MonoBehaviour
         isAttack = false;
     }
 
+    void OnHit()
+    {
+        anim.SetTrigger("hit");
+        health--;
+
+        if (health <= 0)
+        {
+            anim.SetTrigger("dead");
+            //game over
+        }
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(point.position, radius);
@@ -124,6 +138,14 @@ public class Player : MonoBehaviour
         if (collision.gameObject.layer == 6)
         {
             isJumping = false;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == 7)
+        {
+            OnHit();
         }
     }
 }
