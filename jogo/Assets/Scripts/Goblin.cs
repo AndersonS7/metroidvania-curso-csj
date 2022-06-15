@@ -11,13 +11,15 @@ public class Goblin : MonoBehaviour
     private Rigidbody2D rig;
     private Vector2 direction;
 
+    public float health;
     public float speed;
     public float maxVision;
     public float stopDistance;
 
     //controladores
     private bool isFront;
-    public bool isRight;
+    private bool isRight;
+    private bool isDead;
 
     // Start is called before the first frame update
     void Start()
@@ -40,7 +42,7 @@ public class Goblin : MonoBehaviour
 
     void OnMove()
     {
-        if (isFront)
+        if (isFront && !isDead)
         {
             anim.SetInteger("transition", 1);
             if (isRight)
@@ -65,11 +67,26 @@ public class Goblin : MonoBehaviour
         OnMove();
     }
 
+    public void OnHit()
+    {
+        anim.SetTrigger("hit");
+
+        health--;
+
+        if (health <= 0)
+        {
+            isDead = true;
+            speed = 0;
+            anim.SetTrigger("dead");
+            Destroy(gameObject, 1f);
+        }
+    }
+
     void GetPlayer()
     {
         RaycastHit2D hit = Physics2D.Raycast(point.position, direction, maxVision);
 
-        if (hit.collider != null)
+        if (hit.collider != null && !isDead)
         {
             if (hit.transform.CompareTag("Player"))
             {
@@ -96,6 +113,7 @@ public class Goblin : MonoBehaviour
             if (behindeHit.transform.CompareTag("Player"))
             {
                 isRight = !isRight;
+                isFront = true;
             }
         }
     }

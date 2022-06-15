@@ -106,7 +106,15 @@ public class Player : MonoBehaviour
 
             if (hit != null)
             {
-                hit.GetComponent<Slime>().OnHit();
+                if (hit.GetComponent<Slime>())
+                {
+                    hit.GetComponent<Slime>().OnHit();
+                }
+
+                if (hit.GetComponent<Goblin>())
+                {
+                    hit.GetComponent<Goblin>().OnHit();
+                }
             }
 
             StartCoroutine(OnAttack());
@@ -157,6 +165,12 @@ public class Player : MonoBehaviour
         if (collision.gameObject.layer == 7)
         {
             OnHit();
+        }
+
+        if (collision.CompareTag("Coin"))
+        {
+            Controller.instance.GetCoin();
+            Destroy(collision.gameObject);
         }
     }
 }
