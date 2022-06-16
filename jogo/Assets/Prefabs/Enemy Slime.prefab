@@ -180,6 +180,9 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 64
+  layerPlayer:
+    serializedVersion: 2
+    m_Bits: 256
   radius: 0.1
   speed: -1.5
   health: 3
