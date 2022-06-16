@@ -31,22 +31,6 @@ public class PuzzleBtn : MonoBehaviour
         barrieAnim.SetBool("isPressed", false);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("stone"))
-        {
-            OnPressed();
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("stone"))
-        {
-            OnExit();
-        }
-    }
-
     void OnCollision()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, 0.3f, layer);

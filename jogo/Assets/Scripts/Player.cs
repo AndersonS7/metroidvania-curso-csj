@@ -23,6 +23,22 @@ public class Player : MonoBehaviour
     private bool isAttack;
     private bool recovery;
 
+    private static Player instance;
+
+    void Awake()
+    {
+        DontDestroyOnLoad(this);
+
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -158,6 +174,11 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
         }
+
+        if (collision.gameObject.tag == "finish")
+        {
+            PosPlayer.instance.CheckPoint();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -171,6 +192,11 @@ public class Player : MonoBehaviour
         {
             Controller.instance.GetCoin();
             Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.layer == 9)
+        {
+            Controller.instance.NextLvl();
         }
     }
 }

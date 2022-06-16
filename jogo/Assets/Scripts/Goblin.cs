@@ -104,6 +104,12 @@ public class Goblin : MonoBehaviour
                     hit.transform.gameObject.GetComponent<Player>().OnHit();
                 }
             }
+            else
+            {
+                anim.SetInteger("transition", 0);
+                isFront = false;
+                rig.velocity = Vector2.zero;
+            }
         }
 
         RaycastHit2D behindeHit = Physics2D.Raycast(behind.position, -direction, maxVision);
@@ -125,6 +131,6 @@ public class Goblin : MonoBehaviour
 
     //private void OnDrawGizmosSelected()
     //{
-    //    Gizmos.DrawRay(bihide.position, -direction * maxVision);
+    //    Gizmos.DrawRay(behind.position, -direction * maxVision);
     //}
 }
