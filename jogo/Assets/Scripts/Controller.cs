@@ -7,31 +7,42 @@ using UnityEngine;
 public class Controller : MonoBehaviour
 {
     public int score;
-    public Text scoreText;
 
+    public Text scoreText;
     public static Controller instance;
+    public GameObject gameOverPanel;
+
+
     private void Awake()
     {
-        DontDestroyOnLoad(this);
+        instance = this;
 
-        if (instance == null)
+        if (PlayerPrefs.GetInt("score") > 0)
         {
-            instance = this;
+            score = PlayerPrefs.GetInt("score");
+            scoreText.text = "x " + score.ToString();
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        Time.timeScale = 1;
     }
 
     public void GetCoin()
     {
         score++;
         scoreText.text = "x " + score.ToString();
+
+        PlayerPrefs.SetInt("score", score);
+        PlayerPrefs.Save();
     }
 
-    public void NextLvl()
+    public void ShowGameOver()
     {
-        SceneManager.LoadScene(1);
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

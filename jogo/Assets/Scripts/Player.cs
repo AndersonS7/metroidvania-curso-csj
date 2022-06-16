@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     private Rigidbody2D rig;
     private Animator anim;
+    private PlayerAudio playerAudio;
 
     public Transform point;
     public LayerMask enemyLayer;
@@ -13,8 +14,8 @@ public class Player : MonoBehaviour
     public float speed;
     public float jumpForce;
     public float radius;
-    public float health;
-
+    
+    private Health health;
     private float recoveryCount;
 
     //controladores
@@ -27,15 +28,16 @@ public class Player : MonoBehaviour
 
     void Awake()
     {
-        DontDestroyOnLoad(this);
-
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(this);
         }
-        else
+        else if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(instance.gameObject);
+            instance = this;
+            DontDestroyOnLoad(this);
         }
     }
 
@@ -44,6 +46,8 @@ public class Player : MonoBehaviour
     {
         rig = GetComponent<Rigidbody2D>();
         anim = transform.GetChild(0).GetComponent<Animator>();
+        playerAudio = GetComponent<PlayerAudio>();
+        health = GetComponent<Health>();
     }
 
     // Update is called once per frame
@@ -97,6 +101,8 @@ public class Player : MonoBehaviour
         {
             if (!isJumping)
             {
+                playerAudio.PlayerSFX(playerAudio.jumpSound);
+
                 rig.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 isJumping = true;
                 doubleJump = true;
@@ -104,6 +110,8 @@ public class Player : MonoBehaviour
             }
             else if (doubleJump)
             {
+                playerAudio.PlayerSFX(playerAudio.jumpSound);
+
                 rig.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 doubleJump = false;
                 anim.SetInteger("transition", 2);
@@ -116,6 +124,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
+            playerAudio.PlayerSFX(playerAudio.hitSound);
             isAttack = true;
             anim.SetInteger("transition", 3);
             Collider2D hit = Physics2D.OverlapCircle(point.position, radius, enemyLayer);
@@ -150,16 +159,16 @@ public class Player : MonoBehaviour
         if (recoveryCount >= 2f)
         {
             anim.SetTrigger("hit");
-            health--;
+            health.health--;
 
             recoveryCount = 0f;
         }
 
-        if (health <= 0 && !recovery)
+        if (health.health <= 0 && !recovery)
         {
             recovery = true;
             anim.SetTrigger("dead");
-            //game over
+            Controller.instance.ShowGameOver();
         }
     }
 
@@ -190,13 +199,11 @@ public class Player : MonoBehaviour
 
         if (collision.CompareTag("Coin"))
         {
-            Controller.instance.GetCoin();
-            Destroy(collision.gameObject);
-        }
+            playerAudio.PlayerSFX(playerAudio.coinSound);
 
-        if (collision.gameObject.layer == 9)
-        {
-            Controller.instance.NextLvl();
+            Controller.instance.GetCoin();
+            collision.gameObject.GetComponent<Animator>().SetTrigger("destroy");
+            Destroy(collision.gameObject, 0.5f);
         }
     }
 }
